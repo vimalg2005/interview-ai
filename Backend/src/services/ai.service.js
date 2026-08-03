@@ -32,17 +32,20 @@ const interviewReportSchema = z.object({
     title: z.string().describe("The title of the job for which the interview report is generated"),
 })
 
-async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
+async function generateInterviewReport({ resume, selfDescription, jobDescription, questionCount }) {
 
+    const count = questionCount || 5
 
     const prompt = `Generate an interview report for a candidate with the following details:
                         Resume: ${resume}
                         Self Description: ${selfDescription}
                         Job Description: ${jobDescription}
+
+                        Please generate exactly ${count} technical questions and exactly ${count} behavioral questions in the report.
 `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -58,7 +61,14 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
 
 
 async function generatePdfFromHtml(htmlContent) {
-    const browser = await puppeteer.launch()
+    const browser = await puppeteer.launch({
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu'
+        ]
+    })
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" })
 
@@ -96,7 +106,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                     `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
@@ -113,4 +123,130 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+const practiceFeedbackSchema = z.object({
+    score: z.number().min(0).max(100).describe("A rating score out of 100 for the quality of the user's answer."),
+    feedback: z.array(z.string()).describe("A list of concrete points of feedback: what they did well, what was missing, or how to improve."),
+    improvedAnswer: z.string().describe("A professional, high-quality revised version of their answer incorporating the feedback.")
+})
+
+async function evaluatePracticeAnswer({ question, intention, userAnswer, jobDescription }) {
+    const prompt = `You are an expert interviewer evaluating a candidate's answer for the following question.
+                    Question: ${question}
+                    Intention of this question: ${intention}
+                    Candidate's Answer: ${userAnswer}
+                    ${jobDescription ? `Job Description context: ${jobDescription}` : ""}
+
+                    Analyze the response, rate it, and provide constructive feedback with an improved model answer.`
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(practiceFeedbackSchema),
+        }
+    })
+
+    return JSON.parse(response.text)
+}
+const regeneratedQuestionsSchema = z.object({
+    questions: z.array(z.object({
+        question: z.string().describe("The question can be asked in the interview"),
+        intention: z.string().describe("The intention of interviewer behind asking this question"),
+        answer: z.string().describe("How to answer this question, what points to cover, what approach to take etc.")
+    })).describe("List of newly generated questions")
+})
+
+async function regenerateQuestions({ resume, selfDescription, jobDescription, currentQuestions, type, count }) {
+    const qCount = count || 5
+    const existingQsFormatted = currentQuestions && currentQuestions.length > 0
+        ? currentQuestions.map((q, i) => `${i + 1}. ${q.question}`).join("\n")
+        : "None"
+
+    const prompt = `You are generating new mock interview questions for a candidate.
+                    Context:
+                    Resume: ${resume || "Not provided"}
+                    Self Description: ${selfDescription || "Not provided"}
+                    Job Description: ${jobDescription}
+
+                    We already have the following ${type} questions:
+                    ${existingQsFormatted}
+
+                    Please generate a new list of exactly ${qCount} DIFFERENT and other possible ${type} questions that could be asked in the interview. 
+                    Do not repeat or duplicate any of the current questions listed above. Make them unique, relevant, and comprehensive.`
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(regeneratedQuestionsSchema),
+        }
+    })
+
+    const parsed = JSON.parse(response.text)
+    return parsed.questions
+}
+
+const starEvaluationSchema = z.object({
+    score: z.number().min(0).max(100).describe("A rating score out of 100 for the overall impact and alignment of the story"),
+    feedback: z.string().describe("Constructive, detailed analysis of all STAR aspects (Situation, Task, Action, Result) outlining strengths and areas of improvement"),
+    improvedVersion: z.string().describe("A revised, high-impact version of the story using the STAR format, written in a natural human voice, highlighting metrics and results")
+})
+
+async function evaluateStarStory({ question, situation, task, action, result }) {
+    const prompt = `Evaluate a candidate's behavioral story using the STAR framework.
+                    Question: ${question}
+                    
+                    Candidate's STAR Story:
+                    - Situation: ${situation}
+                    - Task: ${task}
+                    - Action: ${action}
+                    - Result: ${result}
+                    
+                    Please review their response, rate it, analyze how well they hit each stage of the STAR method, provide specific critique, and write an improved version of this exact story with higher impact and professional vocabulary.`
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(starEvaluationSchema),
+        }
+    })
+
+    return JSON.parse(response.text)
+}
+
+const codeEvaluationSchema = z.object({
+    isCorrect: z.boolean().describe("True if the code correctly solves the given technical/coding problem, false otherwise"),
+    timeComplexity: z.string().describe("Big-O time complexity of the candidate's solution code, e.g., O(N) or O(N log N)"),
+    spaceComplexity: z.string().describe("Big-O space complexity of the candidate's solution code, e.g., O(1) or O(N)"),
+    critique: z.string().describe("Detailed code review comment analyzing performance bottlenecks, bugs, styles, and naming suggestions"),
+    refactoredCode: z.string().describe("The clean, optimal, well-commented code solution in the same programming language")
+})
+
+async function evaluateCodeSolution({ question, code, language }) {
+    const prompt = `You are an expert technical interviewer reviewing code written by a candidate.
+                    Technical Question: ${question}
+                    
+                    Candidate's Solution Code (written in ${language}):
+                    \`\`\`${language}
+                    ${code}
+                    \`\`\`
+                    
+                    Please review their code, determine if it compiles/runs correctly and solves the problem, analyze its Big-O complexities, critique its styling or algorithms, and provide the refactored, optimal solution.`
+
+    const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+            responseMimeType: "application/json",
+            responseSchema: zodToJsonSchema(codeEvaluationSchema),
+        }
+    })
+
+    return JSON.parse(response.text)
+}
+
+module.exports = { generateInterviewReport, generateResumePdf, evaluatePracticeAnswer, regenerateQuestions, evaluateStarStory, evaluateCodeSolution }

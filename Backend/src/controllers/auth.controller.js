@@ -50,7 +50,8 @@ async function registerUserController(req, res) {
         user: {
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isPremium: user.isPremium
         }
     })
 
@@ -94,7 +95,8 @@ async function loginUserController(req, res) {
         user: {
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isPremium: user.isPremium
         }
     })
 }
@@ -135,10 +137,40 @@ async function getMeController(req, res) {
         user: {
             id: user._id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isPremium: user.isPremium
         }
     })
 
+}
+
+/**
+ * @name upgradeUserController
+ * @description upgrade user to premium status
+ * @access private
+ */
+async function upgradeUserController(req, res) {
+    try {
+        const user = await userModel.findByIdAndUpdate(
+            req.user.id,
+            { isPremium: true },
+            { new: true }
+        )
+
+        res.status(200).json({
+            message: "User upgraded to premium successfully",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isPremium: user.isPremium
+            }
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server error"
+        })
+    }
 }
 
 
@@ -147,5 +179,6 @@ module.exports = {
     registerUserController,
     loginUserController,
     logoutUserController,
-    getMeController
+    getMeController,
+    upgradeUserController
 }

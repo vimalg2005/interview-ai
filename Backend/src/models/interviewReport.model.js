@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 
 
+const codeSandboxSchema = new mongoose.Schema({
+    code: String,
+    language: String,
+    isCorrect: Boolean,
+    timeComplexity: String,
+    spaceComplexity: String,
+    critique: String,
+    refactoredCode: String
+}, {
+    _id: false
+})
+
 const technicalQuestionSchema = new mongoose.Schema({
     question: {
         type: String,
@@ -13,7 +25,23 @@ const technicalQuestionSchema = new mongoose.Schema({
     answer: {
         type: String,
         required: [ true, "Answer is required" ]
+    },
+    codeSandbox: {
+        type: codeSandboxSchema,
+        default: null
     }
+}, {
+    _id: false
+})
+
+const starStorySchema = new mongoose.Schema({
+    situation: String,
+    task: String,
+    action: String,
+    result: String,
+    feedback: String,
+    score: Number,
+    improvedVersion: String
 }, {
     _id: false
 })
@@ -30,6 +58,10 @@ const behavioralQuestionSchema = new mongoose.Schema({
     answer: {
         type: String,
         required: [ true, "Answer is required" ]
+    },
+    starStory: {
+        type: starStorySchema,
+        default: null
     }
 }, {
     _id: false
@@ -72,6 +104,12 @@ const interviewReportSchema = new mongoose.Schema({
     resume: {
         type: String,
     },
+    resumeFile: {
+        type: Buffer,
+    },
+    resumeFileName: {
+        type: String,
+    },
     selfDescription: {
         type: String,
     },
@@ -84,6 +122,10 @@ const interviewReportSchema = new mongoose.Schema({
     behavioralQuestions: [ behavioralQuestionSchema ],
     skillGaps: [ skillGapSchema ],
     preparationPlan: [ preparationPlanSchema ],
+    completedDays: {
+        type: [ Number ],
+        default: []
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users"

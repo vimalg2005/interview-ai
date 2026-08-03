@@ -35,5 +35,12 @@ authRouter.get("/logout", authController.logoutUserController)
  */
 authRouter.get("/get-me", authMiddleware.authUser, authController.getMeController)
 
+/**
+ * @route POST /api/auth/upgrade
+ * @description upgrade current user to premium
+ * @access private
+ */
+authRouter.post("/upgrade", authMiddleware.authUser, authController.upgradeUserController)
+
 
 module.exports = authRouter

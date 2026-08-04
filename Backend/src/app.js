@@ -4,10 +4,30 @@ const cors = require("cors")
 
 const app = express()
 
+app.set("trust proxy", 1)
+
 app.use(express.json())
 app.use(cookieParser())
+
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    process.env.FRONTEND_URL
+].filter(Boolean)
+
 app.use(cors({
-    origin: [ "http://localhost:5173", process.env.FRONTEND_URL ].filter(Boolean),
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true)
+        const originClean = origin.replace(/\/$/, "")
+        const isAllowed = allowedOrigins.some(allowed => allowed.replace(/\/$/, "") === originClean)
+            || originClean.endsWith(".vercel.app")
+            || originClean.includes("localhost:")
+        if (isAllowed) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
     credentials: true
 }))
 

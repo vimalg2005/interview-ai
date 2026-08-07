@@ -2,6 +2,7 @@ import React,{useState} from 'react'
 import { useNavigate, Link } from 'react-router'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
+import ThemeToggle from '../../interview/components/ThemeToggle'
 
 const Login = () => {
 
@@ -32,6 +33,7 @@ const Login = () => {
 
     return (
         <main>
+            <ThemeToggle style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000 }} />
             <div className="form-container">
                 <div className="brand-header">
                     <span className="brand-logo">🎯</span>

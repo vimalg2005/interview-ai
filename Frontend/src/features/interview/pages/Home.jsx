@@ -3,6 +3,7 @@ import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate, Link } from 'react-router'
 import { useAuth } from '../../auth/hooks/useAuth'
+import ThemeToggle from '../components/ThemeToggle'
 
 const FEATURE_DETAILS = {
     ats: {
@@ -170,6 +171,7 @@ const Home = () => {
     if (!user) {
         return (
             <div className='home-page'>
+                <ThemeToggle style={{ position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000 }} />
                 <div className='landing-container'>
                     {/* Hero Section */}
                     <section className='hero-section'>
@@ -287,8 +289,9 @@ const Home = () => {
                     <span className='brand-logo'>🎯</span>
                     <span className='brand-name'>InterviewPrep.AI</span>
                 </div>
-                <div className='user-profile'>
+                <div className='user-profile' style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <span className='user-greeting'>👋 Welcome, <strong>{user?.username}</strong></span>
+                    <ThemeToggle />
                     <button onClick={handleUserLogout} className='logout-btn'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
                         Logout
@@ -297,7 +300,7 @@ const Home = () => {
             </div>
 
             {/* Dashboard Tabs Toggle */}
-            <div className='dashboard-tabs' style={{ display: 'flex', gap: '1rem', padding: '0 2rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '2rem' }}>
+            <div className='dashboard-tabs' style={{ display: 'flex', gap: '1rem', padding: '0 2rem', borderBottom: '1px solid var(--border-color)', marginBottom: '2rem' }}>
                 <button 
                     onClick={() => setActiveSection("generator")}
                     className={`tab-btn ${activeSection === 'generator' ? 'tab-btn--active' : ''}`}
@@ -305,7 +308,7 @@ const Home = () => {
                         background: 'none',
                         border: 'none',
                         borderBottom: activeSection === 'generator' ? '2px solid #ff2d78' : '2px solid transparent',
-                        color: activeSection === 'generator' ? '#fff' : '#8b949e',
+                        color: activeSection === 'generator' ? 'var(--text-primary)' : 'var(--text-muted)',
                         padding: '1rem 0.5rem',
                         fontSize: '0.9rem',
                         fontWeight: 600,
@@ -325,7 +328,7 @@ const Home = () => {
                         background: 'none',
                         border: 'none',
                         borderBottom: activeSection === 'analytics' ? '2px solid #ff2d78' : '2px solid transparent',
-                        color: activeSection === 'analytics' ? '#fff' : '#8b949e',
+                        color: activeSection === 'analytics' ? 'var(--text-primary)' : 'var(--text-muted)',
                         padding: '1rem 0.5rem',
                         fontSize: '0.9rem',
                         fontWeight: 600,
@@ -341,12 +344,12 @@ const Home = () => {
             </div>
 
             {activeSection === "analytics" ? (
-                <div className='analytics-dashboard' style={{ padding: '0 2rem', color: '#c9d1d9', maxWidth: '1200px', margin: '0 auto' }}>
+                <div className='analytics-dashboard' style={{ padding: '0 2rem', color: 'var(--text-primary)', maxWidth: '1200px', margin: '0 auto' }}>
                     
                     {/* Header */}
                     <div style={{ marginBottom: '2rem' }}>
-                        <h2 style={{ color: '#fff', fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0' }}>Performance Insights</h2>
-                        <p style={{ color: '#8b949e', fontSize: '0.9rem', margin: 0 }}>Aggregated analytics tracking your interview prep stats, score trends, and critical skill gaps.</p>
+                        <h2 style={{ color: 'var(--text-primary)', fontSize: '1.75rem', fontWeight: 800, margin: '0 0 0.5rem 0' }}>Performance Insights</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Aggregated analytics tracking your interview prep stats, score trends, and critical skill gaps.</p>
                     </div>
 
                     {analyticsLoading ? (
@@ -359,20 +362,20 @@ const Home = () => {
                             
                             {/* Summary Cards */}
                             <div className='analytics-stats-grid' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem' }}>
-                                <div className='stat-card' style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                    <span style={{ fontSize: '0.8rem', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Prep Strategies</span>
+                                <div className='stat-card' style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Prep Strategies</span>
                                     <span style={{ fontSize: '2.25rem', fontWeight: 800, color: '#ff2d78' }}>{analyticsData.stats.totalPlans}</span>
-                                    <span style={{ fontSize: '0.75rem', color: '#7d8590' }}>Jobs analyzed by AI</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Jobs analyzed by AI</span>
                                 </div>
-                                <div className='stat-card' style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                    <span style={{ fontSize: '0.8rem', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Match Score</span>
+                                <div className='stat-card' style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Average Match Score</span>
                                     <span style={{ fontSize: '2.25rem', fontWeight: 800, color: '#ffd700' }}>{analyticsData.stats.averageScore}%</span>
-                                    <span style={{ fontSize: '0.75rem', color: '#7d8590' }}>Standard alignment level</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Standard alignment level</span>
                                 </div>
-                                <div className='stat-card' style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                    <span style={{ fontSize: '0.8rem', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Skill Gaps Identified</span>
-                                    <span style={{ fontSize: '2.25rem', fontWeight: 800, color: '#58a6ff' }}>{analyticsData.stats.totalSkillsIdentified}</span>
-                                    <span style={{ fontSize: '0.75rem', color: '#7d8590' }}>Topics requiring study</span>
+                                <div className='stat-card' style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Skill Gaps Identified</span>
+                                    <span style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--accent-blue)' }}>{analyticsData.stats.totalSkillsIdentified}</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Topics requiring study</span>
                                 </div>
                             </div>
 
@@ -380,23 +383,23 @@ const Home = () => {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
                                 
                                 {/* Score Trend Line Chart */}
-                                <div className='chart-container' style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                    <h4 style={{ color: '#fff', margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 600 }}>Match Score Progress Trend</h4>
+                                <div className='chart-container' style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                    <h4 style={{ color: 'var(--text-primary)', margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 600 }}>Match Score Progress Trend</h4>
                                     
                                     {/* Custom SVG Line Chart */}
                                     <div style={{ width: '100%', height: '240px', position: 'relative' }}>
                                         <svg viewBox="0 0 500 220" width="100%" height="100%">
                                             {/* Grid lines */}
-                                            <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                                            <line x1="40" y1="70" x2="480" y2="70" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                                            <line x1="40" y1="120" x2="480" y2="120" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                                            <line x1="40" y1="170" x2="480" y2="170" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+                                            <line x1="40" y1="20" x2="480" y2="20" stroke="var(--border-color)" opacity="0.3" strokeDasharray="3" />
+                                            <line x1="40" y1="70" x2="480" y2="70" stroke="var(--border-color)" opacity="0.3" strokeDasharray="3" />
+                                            <line x1="40" y1="120" x2="480" y2="120" stroke="var(--border-color)" opacity="0.3" strokeDasharray="3" />
+                                            <line x1="40" y1="170" x2="480" y2="170" stroke="var(--border-color)" opacity="0.3" strokeDasharray="3" />
                                             
                                             {/* Y-Axis Labels */}
-                                            <text x="10" y="25" fill="#7d8590" fontSize="10">100%</text>
-                                            <text x="15" y="75" fill="#7d8590" fontSize="10">75%</text>
-                                            <text x="15" y="125" fill="#7d8590" fontSize="10">50%</text>
-                                            <text x="15" y="175" fill="#7d8590" fontSize="10">25%</text>
+                                            <text x="10" y="25" fill="var(--text-muted)" fontSize="10">100%</text>
+                                            <text x="15" y="75" fill="var(--text-muted)" fontSize="10">75%</text>
+                                            <text x="15" y="125" fill="var(--text-muted)" fontSize="10">50%</text>
+                                            <text x="15" y="175" fill="var(--text-muted)" fontSize="10">25%</text>
 
                                             {/* Draw Line & Points */}
                                             {(() => {
@@ -443,11 +446,11 @@ const Home = () => {
                                                                     cy={p.y} 
                                                                     r="5" 
                                                                     fill="#ff2d78" 
-                                                                    stroke="#161b22" 
+                                                                    stroke="var(--bg-card)" 
                                                                     strokeWidth="2" 
                                                                 />
                                                                 <title>{p.title}: {p.score}%</title>
-                                                                <text x={p.x} y={p.y - 10} fill="#fff" fontSize="8" textAnchor="middle" fontWeight="bold">{p.score}%</text>
+                                                                <text x={p.x} y={p.y - 10} fill="var(--text-primary)" fontSize="8" textAnchor="middle" fontWeight="bold">{p.score}%</text>
                                                             </g>
                                                         ))}
                                                     </>
@@ -455,12 +458,12 @@ const Home = () => {
                                             })()}
                                         </svg>
                                     </div>
-                                    <span style={{ fontSize: '0.75rem', color: '#7d8590', display: 'block', textAlign: 'center', marginTop: '0.5rem' }}>Sequential Plan Executions</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', textAlign: 'center', marginTop: '0.5rem' }}>Sequential Plan Executions</span>
                                 </div>
 
                                 {/* Skills Gap Frequency Bar Chart */}
-                                <div className='chart-container' style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                    <h4 style={{ color: '#fff', margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 600 }}>Top Technical Skill Gaps Identified</h4>
+                                <div className='chart-container' style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                    <h4 style={{ color: 'var(--text-primary)', margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: 600 }}>Top Technical Skill Gaps Identified</h4>
                                     
                                     {analyticsData.topSkills?.length > 0 ? (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '240px', justifyContent: 'center' }}>
@@ -469,12 +472,12 @@ const Home = () => {
                                                 const pct = maxCount > 0 ? (item.count / maxCount) * 100 : 0
                                                 return (
                                                     <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#c9d1d9' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
                                                             <span style={{ fontWeight: 600 }}>{item.skill}</span>
-                                                            <span style={{ color: '#8b949e' }}>Flagged {item.count} time(s)</span>
+                                                            <span style={{ color: 'var(--text-muted)' }}>Flagged {item.count} time(s)</span>
                                                         </div>
-                                                        <div style={{ width: '100%', height: '8px', background: '#30363d', borderRadius: '4px', overflow: 'hidden' }}>
-                                                            <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, #58a6ff 0%, #1f6feb 100%)', borderRadius: '4px', transition: 'width 1s ease-in-out' }} />
+                                                        <div style={{ width: '100%', height: '8px', background: 'var(--bg-input)', borderRadius: '4px', overflow: 'hidden' }}>
+                                                            <div style={{ width: `${pct}%`, height: '100%', background: 'linear-gradient(90deg, var(--accent-blue) 0%, var(--border-color) 100%)', borderRadius: '4px', transition: 'width 1s ease-in-out' }} />
                                                         </div>
                                                     </div>
                                                 )
@@ -490,11 +493,11 @@ const Home = () => {
                             </div>
                             
                             {/* Question Type Distribution Card */}
-                            <div style={{ background: '#161b22', border: '1px solid #21262d', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                                <h4 style={{ color: '#fff', margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 600 }}>Question Coverage Breakdown</h4>
+                            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                <h4 style={{ color: 'var(--text-primary)', margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: 600 }}>Question Coverage Breakdown</h4>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                                     <div style={{ flex: 1, minWidth: '240px' }}>
-                                        <p style={{ color: '#8b949e', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 1rem 0' }}>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.4, margin: '0 0 1rem 0' }}>
                                             Proportion of mock questions analyzed and generated by AI categories across your technical capabilities and behavioral framework profiles.
                                         </p>
                                         <div style={{ display: 'flex', gap: '1.5rem' }}>
@@ -531,7 +534,7 @@ const Home = () => {
                                                         strokeDashoffset={dashoffset}
                                                         transform="rotate(-90 60 60)"
                                                     />
-                                                    <text x="60" y="65" fill="#fff" fontSize="11" textAnchor="middle" fontWeight="bold">
+                                                    <text x="60" y="65" fill="var(--text-primary)" fontSize="11" textAnchor="middle" fontWeight="bold">
                                                         {total} Total Qs
                                                     </text>
                                                 </svg>
@@ -543,10 +546,10 @@ const Home = () => {
 
                         </div>
                     ) : (
-                        <div style={{ textAlign: 'center', padding: '4rem 0', background: '#161b22', border: '1px solid #21262d', borderRadius: '0.75rem' }}>
+                        <div style={{ textAlign: 'center', padding: '4rem 0', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '0.75rem' }}>
                             <span style={{ fontSize: '3rem', marginBottom: '1rem', display: 'block' }}>📈</span>
-                            <h3 style={{ color: '#fff', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Analytics Data Yet</h3>
-                            <p style={{ color: '#8b949e', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 1.5rem auto', lineHeight: 1.4 }}>
+                            <h3 style={{ color: 'var(--text-primary)', fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Analytics Data Yet</h3>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 1.5rem auto', lineHeight: 1.4 }}>
                                 Generate your first interview strategy plan using the tab above to display performance progression trends.
                             </p>
                             <button onClick={() => setActiveSection("generator")} className='btn btn-primary'>Create Prep Plan</button>

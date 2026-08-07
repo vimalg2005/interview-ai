@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router'
 import { useAuth } from '../../auth/hooks/useAuth'
 import PracticeSession from '../components/PracticeSession'
 import FlashcardsDeck from '../components/FlashcardsDeck'
+import ThemeToggle from '../components/ThemeToggle'
 
 const NAV_ITEMS = [
     { id: 'technical', label: 'Technical Questions', icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>) },
@@ -544,16 +545,19 @@ const Interview = () => {
                 {/* ── Left Nav ── */}
                 <nav className='interview-nav'>
                     <div className="nav-content">
-                        <button
-                            className='interview-nav__item'
-                            onClick={() => navigate('/')}
-                            style={{ marginBottom: '1.25rem', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(255,255,255,0.03)' }}
-                        >
-                            <span className='interview-nav__icon'>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            </span>
-                            Back to Dashboard
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem', width: '100%' }}>
+                            <button
+                                className='interview-nav__item'
+                                onClick={() => navigate('/')}
+                                style={{ flex: 1, margin: 0, border: '1px solid var(--border-color)', background: 'var(--bg-panel)' }}
+                            >
+                                <span className='interview-nav__icon'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                </span>
+                                Back
+                            </button>
+                            <ThemeToggle />
+                        </div>
 
                         <p className='interview-nav__label'>Sections</p>
                         {NAV_ITEMS.map(item => (

@@ -1,0 +1,150 @@
+@use "sass:color";
+@use "sass:meta";
+@use "sass:string";
+@use "sass:math";
+@use "sass:list";
+
+// ── Custom rgba/lighten/darken helpers to support CSS variables ──
+
+@function rgba($args...) {
+  $len: list.length($args);
+  @if $len == 4 {
+    $r: list.nth($args, 1);
+    $g: list.nth($args, 2);
+    $b: list.nth($args, 3);
+    $a: list.nth($args, 4);
+    @if meta.type-of($r) == 'number' and meta.type-of($g) == 'number' and meta.type-of($b) == 'number' {
+      @return color.change(rgb($r, $g, $b), $alpha: $a);
+    }
+    @return string.unquote("rgba(#{$r}, #{$g}, #{$b}, #{$a})");
+  } @else if $len == 2 {
+    $color: list.nth($args, 1);
+    $alpha: list.nth($args, 2);
+    @if meta.type-of($color) == 'color' {
+      @return color.change($color, $alpha: $alpha);
+    }
+    @return string.unquote("color-mix(in srgb, #{$color} #{$alpha * 100}%, transparent)");
+  } @else {
+    @return string.unquote("rgba(#{$args})");
+  }
+}
+
+
+
+@function lighten($color, $amount) {
+  @if meta.type-of($color) == 'color' {
+    @return color.adjust($color, $lightness: $amount);
+  }
+  $val: $amount;
+  @if not math.is-unitless($amount) {
+    $val: math.div($amount, $amount * 0 + 1);
+  }
+  $pct: 100 - $val;
+  @return string.unquote("color-mix(in srgb, #{$color} #{$pct}%, white)");
+}
+
+@function darken($color, $amount) {
+  @if meta.type-of($color) == 'color' {
+    @return color.adjust($color, $lightness: -$amount);
+  }
+  $val: $amount;
+  @if not math.is-unitless($amount) {
+    $val: math.div($amount, $amount * 0 + 1);
+  }
+  $pct: 100 - $val;
+  @return string.unquote("color-mix(in srgb, #{$color} #{$pct}%, black)");
+}
+
+// ── Theme Definitions ──
+
+:root {
+  --bg-page: #0d1117;
+  --bg-card: #161b22;
+  --bg-panel: #1c2230;
+  --bg-input: #1e2535;
+  --border-color: #2a3348;
+  --text-primary: #e6edf3;
+  --text-muted: #7d8590;
+  --accent: #ff2d78;
+  --accent-alt: #ff6b9d;
+  --accent-blue: #58a6ff;
+  --badge-required: #ff2d78;
+  --badge-best: #ff2d78;
+  --info-bg: #1b2a4a;
+  --info-border: #2d4a7a;
+  --severity-high: #ff4d4d;
+  --severity-medium: #f5a623;
+  --severity-low: #3fb950;
+}
+
+[data-theme="light"] {
+  --bg-page: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-panel: #f1f3f5;
+  --bg-input: #e9ecef;
+  --border-color: #dee2e6;
+  --text-primary: #212529;
+  --text-muted: #495057;
+  --accent: #d20d3b;
+  --accent-alt: #ff5c8a;
+  --accent-blue: #0066cc;
+  --badge-required: #d20d3b;
+  --badge-best: #d20d3b;
+  --info-bg: #e7f5ff;
+  --info-border: #a3daff;
+  --severity-high: #cf222e;
+  --severity-medium: #bf8700;
+  --severity-low: #1a7f37;
+}
+
+// Redefining SCSS variables to map to CSS custom properties
+$bg-page: var(--bg-page);
+$bg-card: var(--bg-card);
+$bg-panel: var(--bg-panel);
+$bg-input: var(--bg-input);
+$border-color: var(--border-color);
+$text-primary: var(--text-primary);
+$text-muted: var(--text-muted);
+$accent: var(--accent);
+$accent-alt: var(--accent-alt);
+$accent-blue: var(--accent-blue);
+$badge-required: var(--badge-required);
+$badge-best: var(--badge-best);
+$info-bg: var(--info-bg);
+$info-border: var(--info-border);
+$severity-high: var(--severity-high);
+$severity-medium: var(--severity-medium);
+$severity-low: var(--severity-low);
+
+.theme-toggle-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  outline: none;
+
+  &:hover {
+    transform: scale(1.08) rotate(15deg);
+    background: var(--bg-input);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  svg {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
